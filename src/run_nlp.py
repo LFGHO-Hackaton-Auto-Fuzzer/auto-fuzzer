@@ -20,11 +20,11 @@ OPENAI_API_KEY = os.getenv('OPENAI_API_KEY')
 def load_invariants():
     f = open('invariants_examples.json')
     data = json.load(f)
+    for d in data:
+        d.pop('name',None)
     return data
 
 def create_echidna_functions(contract : str) -> str:
-    data = load_invariants()
-    chat = ChatOpenAI(temperature=0.0, openai_api_key=OPENAI_API_KEY)
     data = load_invariants()
     chat = ChatOpenAI(temperature=0.0, openai_api_key=OPENAI_API_KEY)
     messages =[
@@ -33,11 +33,10 @@ def create_echidna_functions(contract : str) -> str:
             You are going to generate echidna function to test a new smart contract, 
             to do that I'm going to give you the following a json with examples in which you are 
             going to find the original contract 'contract', the tests 'tests' and the config file
-            needed as 'config'
+            needed as 'config'.
             """
+            + str(data[:20])
             ),
-        HumanMessage(content=str(data[:20])),
-        HumanMessage(content=str(data[30:40])),
         HumanMessage(content=f"""
                         generate a json with two keys 'tests' and 'config' with the echidna function to test
                         and the configfile (if is neeeded) for the following contract: {contract}
